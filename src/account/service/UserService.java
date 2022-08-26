@@ -35,12 +35,12 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username.toLowerCase())
+        return userRepo.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found: " + username));
     }
 
     synchronized public UserDto addUser(UserDto userDto) {
-        if (userRepo.existsByUsername(userDto.getEmail().toLowerCase())) {
+        if (userRepo.existsByUsernameIgnoreCase(userDto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User exist!");
         }
         authService.ensurePasswordIsOK(userDto.getPassword());
@@ -58,7 +58,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserByName(String username) {
-        return userRepo.findByUsername(username)
+        return userRepo.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found: " + username));
     }
 
@@ -84,23 +84,27 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(String email) {
-        User user = userRepo.findByUsername(email)
+        User user = userRepo.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
         userRepo.delete(user);
     }
 
     public UserDto changeUserRole(RoleChangeRequest roleChangeRequest) {
-        User user = userRepo.findByUsername(roleChangeRequest.getUser())
+        User user = userRepo.findByUsernameIgnoreCase(roleChangeRequest.getUser())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
-        UserGroup userGroup = userGroupService.getGroupByCode(roleChangeRequest.getRole())
+        UserGroup userGroup = userGroupService.getGroupByCode("ROLE_" + roleChangeRequest.getRole())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!"));
-        if (userGroup.equals(userGroupService.getAdministrator())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
-        }
 
         if (roleChangeRequest.getOperation() == RoleChangeOperation.GRANT) {
-
+            user.addGroup(userGroup);
+        } else {
+            if (userGroup.equals(userGroupService.getAdministrator())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
+            }
+            user.removeGroup(userGroup);
         }
+        userRepo.save(user);
+        return Mappers.fromUser(user);
     }
 
 }

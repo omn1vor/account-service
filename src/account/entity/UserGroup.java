@@ -18,6 +18,7 @@ public class UserGroup {
     @Column(unique = true, nullable = false)
     private String code;
     private String name;
+    private boolean administrative;
 
     @ManyToMany(mappedBy = "userGroups")
     private Set<User> users;

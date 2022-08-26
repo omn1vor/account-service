@@ -10,6 +10,7 @@ import account.repository.UserRepository;
 import account.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -91,6 +92,14 @@ public class SalaryService {
             return null;
         }
         return Mappers.fromSalary(salary.get(), user);
+    }
+
+    @Transactional
+    public void ensureThisIsNotAdministrativeUser(String email) {
+        User user = userService.getUserByName(email);
+        if (user.isAdministrativeAccount()) {
+            throw new AccessDeniedException("Trying to access business endpoint with administrative user");
+        }
     }
 
     private boolean salaryListIsUnique(List<SalaryRequest> list) {

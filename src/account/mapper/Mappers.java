@@ -5,9 +5,9 @@ import account.dto.SalaryResponse;
 import account.dto.UserDto;
 import account.entity.Salary;
 import account.entity.User;
+import account.entity.UserGroup;
 import account.util.DateUtils;
 import account.util.NumberUtils;
-import org.springframework.security.core.GrantedAuthority;
 
 public class Mappers {
 
@@ -17,8 +17,8 @@ public class Mappers {
         userDto.setName(user.getName());
         userDto.setLastName(user.getLastName());
         userDto.setEmail(user.getUsername());
-        userDto.setRoles(user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+        userDto.setRoles(user.getUserGroups().stream()
+                .map(UserGroup::getCode)
                 .sorted()
                 .toList()
         );

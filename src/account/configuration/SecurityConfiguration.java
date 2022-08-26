@@ -22,9 +22,11 @@ public class SecurityConfiguration {
                 .authorizeRequests()
                 .mvcMatchers(HttpMethod.POST,
                         "/api/auth/signup",
-                        "/api/acct/payments",
                         "/actuator/shutdown").permitAll()
-                .mvcMatchers(HttpMethod.PUT, "/api/acct/payments").permitAll()
+                .mvcMatchers("/api/auth/changepass").authenticated()
+                .mvcMatchers("api/empl/payment").hasAnyRole("USER, ACCOUNTANT")
+                .mvcMatchers("/api/admin/**").hasRole("ADMINISTRATOR")
+                .mvcMatchers("/api/acct/**").hasRole("ACCOUNTANT")
                 .mvcMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

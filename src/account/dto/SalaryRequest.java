@@ -5,15 +5,16 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 @Getter @Setter
 public class SalaryRequest {
-    @NotBlank
+    @NotBlank(message = "email shouldn't be empty")
     private String employee; // email as an ID
-    @NotBlank
+    @Pattern(regexp = "\\d{1,2}-\\d{4}", message = "period should be of 'MM-yyyy' format")
     private String period;
-    @Min(1)
+    @Min(value = 1, message = "salary should be greater than 0")
     private Long salary;
 
     @Override

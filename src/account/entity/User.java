@@ -2,9 +2,11 @@ package account.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.util.*;
@@ -86,10 +88,27 @@ public class User implements UserDetails {
     }
 
     public void addGroup(UserGroup userGroup) {
+        if (!userGroups.isEmpty() && userGroup.isAdministrative() != isAdministrativeAccount()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The user cannot combine administrative and business roles!");
+        }
         userGroups.add(userGroup);
     }
 
     public void removeGroup(UserGroup userGroup) {
+        if (!userGroups.contains(userGroup)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The user does not have a role!");
+        }
+        if (userGroups.size() == 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The user must have at least one role!");
+        }
         userGroups.remove(userGroup);
+    }
+
+    public boolean isAdministrativeAccount() {
+        return userGroups.stream()
+                .anyMatch(UserGroup::isAdministrative);
     }
 }

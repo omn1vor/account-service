@@ -35,7 +35,7 @@ public class AdminController {
     }
 
     @PutMapping("/user/role")
-    public UserDto changeRole(@Valid RoleChangeRequest body) {
+    public UserDto changeRole(@Valid @RequestBody RoleChangeRequest body) {
         return userService.changeUserRole(body);
     }
 }

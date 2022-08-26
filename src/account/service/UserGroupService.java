@@ -11,33 +11,44 @@ import java.util.Optional;
 @Service
 @Transactional
 public class UserGroupService {
-    @Autowired
-    private UserGroupRepository userGroupRepo;
+    private final UserGroupRepository userGroupRepo;
+
+    public UserGroupService(@Autowired UserGroupRepository userGroupRepo) {
+        this.userGroupRepo = userGroupRepo;
+        init();
+    }
+
+    public void init() {
+        getAdministrator();
+        getUser();
+        getAccountant();
+    }
 
     public UserGroup getAdministrator() {
-        return findCreateGroupByCode("ADMINISTRATOR");
+        return findCreateGroupByCode("ROLE_ADMINISTRATOR", true);
     }
 
     public UserGroup getAccountant() {
-        return findCreateGroupByCode("ACCOUNTANT");
+        return findCreateGroupByCode("ROLE_ACCOUNTANT", false);
     }
 
     public UserGroup getUser() {
-        return findCreateGroupByCode("USER");
+        return findCreateGroupByCode("ROLE_USER", false);
     }
 
     public Optional<UserGroup> getGroupByCode(String code) {
         return userGroupRepo.findByCode(code);
     }
 
-    private UserGroup findCreateGroupByCode(String code) {
-        return userGroupRepo.findByCode(code).orElseGet(() -> createGroup(code));
+    private UserGroup findCreateGroupByCode(String code, boolean administrative) {
+        return userGroupRepo.findByCode(code).orElseGet(() -> createGroup(code, administrative));
     }
 
-    private UserGroup createGroup(String code) {
+    private UserGroup createGroup(String code, boolean administrative) {
         UserGroup userGroup = new UserGroup();
         userGroup.setCode(code.toUpperCase());
         userGroup.setName(code);
+        userGroup.setAdministrative(administrative);
         userGroupRepo.save(userGroup);
         return userGroup;
     }
