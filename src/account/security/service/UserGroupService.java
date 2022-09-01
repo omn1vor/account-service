@@ -1,7 +1,7 @@
-package account.auth.service;
+package account.security.service;
 
-import account.auth.entity.UserGroup;
-import account.auth.repository.UserGroupRepository;
+import account.security.entity.UserGroup;
+import account.security.repository.UserGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +22,7 @@ public class UserGroupService {
         getAdministrator();
         getUser();
         getAccountant();
+        getAuditor();
     }
 
     public UserGroup getAdministrator() {
@@ -30,6 +31,10 @@ public class UserGroupService {
 
     public UserGroup getAccountant() {
         return findCreateGroupByCode("ROLE_ACCOUNTANT", false);
+    }
+
+    public UserGroup getAuditor() {
+        return findCreateGroupByCode("ROLE_AUDITOR", false);
     }
 
     public UserGroup getUser() {
@@ -47,7 +52,7 @@ public class UserGroupService {
     private UserGroup createGroup(String code, boolean administrative) {
         UserGroup userGroup = new UserGroup();
         userGroup.setCode(code.toUpperCase());
-        userGroup.setName(code);
+        userGroup.setName(code.replace("ROLE_", ""));
         userGroup.setAdministrative(administrative);
         userGroupRepo.save(userGroup);
         return userGroup;

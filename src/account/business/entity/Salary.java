@@ -1,6 +1,6 @@
 package account.business.entity;
 
-import account.auth.entity.User;
+import account.security.entity.User;
 import lombok.*;
 
 import javax.persistence.*;

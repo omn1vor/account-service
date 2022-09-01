@@ -1,8 +1,11 @@
 package account.configuration;
 
+import account.security.entity.Action;
+import account.security.service.AuditService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +20,8 @@ import java.util.Map;
 
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-    Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
+    @Autowired
+    AuditService auditService;
 
     @Override
     public void handle(
@@ -27,11 +31,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            logger.warn("User: " + auth.getName()
-                    + " attempted to access the protected URL: "
-                    + request.getRequestURI());
+            auditService.addEvent(auth.getName(), Action.ACCESS_DENIED, request.getRequestURI());
         }
-        String message = "";
 
         ObjectMapper mapper = new ObjectMapper();
         response.setContentType("application/json;charset=UTF-8");

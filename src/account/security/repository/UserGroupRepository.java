@@ -1,6 +1,6 @@
-package account.auth.repository;
+package account.security.repository;
 
-import account.auth.entity.UserGroup;
+import account.security.entity.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

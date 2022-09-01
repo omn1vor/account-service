@@ -1,4 +1,4 @@
-package account.auth.service;
+package account.security.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -3,11 +3,11 @@ package account.business.service;
 import account.business.dto.SalaryRequest;
 import account.business.dto.SalaryResponse;
 import account.business.entity.Salary;
-import account.auth.entity.User;
+import account.security.entity.User;
 import account.business.Mappers;
 import account.business.repository.SalaryRepository;
-import account.auth.repository.UserRepository;
-import account.auth.service.UserService;
+import account.security.repository.UserRepository;
+import account.security.service.UserService;
 import account.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class SalaryService {
 
     @Autowired
@@ -32,7 +33,7 @@ public class SalaryService {
     @Autowired
     SalaryRepository salaryRepo;
 
-    @Transactional
+
     public void addSalary(List<SalaryRequest> list) {
         if (!salaryListIsUnique(list)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee-period pairs must be unique!");
@@ -51,7 +52,6 @@ public class SalaryService {
         }
     }
 
-    @Transactional
     public void updateSalary(SalaryRequest salaryRequest) {
         User user = userService.getUserByName(salaryRequest.getEmployee());
         LocalDate period = DateUtils.parseDateFromMonthYear(salaryRequest.getPeriod());
@@ -72,7 +72,6 @@ public class SalaryService {
         userRepo.save(user);
     }
 
-    @Transactional
     public List<SalaryResponse> getSalary(String email) {
         User user = userService.getUserByName(email);
         return user.getSalary().stream()
@@ -81,7 +80,6 @@ public class SalaryService {
                 .toList();
     }
 
-    @Transactional
     public SalaryResponse getSalary(String email, String rawDate) {
         User user = userService.getUserByName(email);
         LocalDate period = DateUtils.parseDateFromMonthYear(rawDate);
@@ -95,7 +93,6 @@ public class SalaryService {
         return Mappers.fromSalary(salary.get(), user);
     }
 
-    @Transactional
     public void ensureThisIsNotAdministrativeUser(String email) {
         User user = userService.getUserByName(email);
         if (user.isAdministrativeAccount()) {

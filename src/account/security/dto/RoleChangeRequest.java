@@ -1,6 +1,6 @@
-package account.auth.dto;
+package account.security.dto;
 
-import account.auth.entity.RoleChangeOperation;
+import account.security.entity.RoleChangeOperation;
 import lombok.Getter;
 import lombok.Setter;
 

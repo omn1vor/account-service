@@ -1,4 +1,4 @@
-package account.auth.entity;
+package account.security.entity;
 
 import account.business.entity.Salary;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -37,6 +37,8 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     private Set<UserGroup> userGroups = new HashSet<>();
+    private boolean locked;
+    private int failedLoginAttempts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,7 +64,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -111,5 +113,9 @@ public class User implements UserDetails {
     public boolean isAdministrativeAccount() {
         return userGroups.stream()
                 .anyMatch(UserGroup::isAdministrative);
+    }
+
+    public int addFailedLoginAttempt() {
+        return ++failedLoginAttempts;
     }
 }

@@ -1,4 +1,4 @@
-package account.auth.entity;
+package account.security.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,8 @@ import java.util.Set;
 @Getter @Setter
 public class UserGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false)
     private Long id;
 
     @Column(unique = true, nullable = false)

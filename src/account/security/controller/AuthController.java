@@ -1,11 +1,11 @@
-package account.auth.controller;
+package account.security.controller;
 
-import account.auth.dto.PasswordChangeRequest;
-import account.auth.dto.PasswordChangeResponse;
-import account.auth.dto.UserDto;
-import account.auth.entity.User;
-import account.auth.service.UserService;
+import account.security.dto.PasswordChangeRequest;
+import account.security.dto.UserDto;
+import account.security.entity.User;
+import account.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,9 +28,12 @@ public class AuthController {
     }
 
     @PostMapping("/changepass")
-    public PasswordChangeResponse changePassword(@RequestBody PasswordChangeRequest request,
-                                                 @AuthenticationPrincipal User user) {
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody PasswordChangeRequest request,
+                                                              @AuthenticationPrincipal User user) {
         userService.changePassword(user, request.getNewPassword());
-        return new PasswordChangeResponse(user.getUsername(), "The password has been updated successfully");
+        return ResponseEntity.ok(Map.of(
+                "email", user.getUsername(),
+                "status", "The password has been updated successfully"
+        ));
     }
 }

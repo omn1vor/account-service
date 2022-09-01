@@ -3,7 +3,7 @@ package account.business;
 import account.business.dto.SalaryRequest;
 import account.business.dto.SalaryResponse;
 import account.business.entity.Salary;
-import account.auth.entity.User;
+import account.security.entity.User;
 import account.util.DateUtils;
 import account.util.NumberUtils;
 

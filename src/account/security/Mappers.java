@@ -1,8 +1,8 @@
-package account.auth;
+package account.security;
 
-import account.auth.dto.UserDto;
-import account.auth.entity.User;
-import account.auth.entity.UserGroup;
+import account.security.dto.UserDto;
+import account.security.entity.User;
+import account.security.entity.UserGroup;
 
 public class Mappers {
 

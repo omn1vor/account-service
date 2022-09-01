@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.web.context.request.RequestContextListener;
 
 @Configuration
 public class SecurityConfiguration {
@@ -23,9 +24,11 @@ public class SecurityConfiguration {
                 .mvcMatchers(HttpMethod.POST,
                         "/api/auth/signup",
                         "/actuator/shutdown").permitAll()
-                .mvcMatchers("/api/auth/changepass").authenticated()
-                .mvcMatchers("api/empl/payment").hasAnyRole("USER, ACCOUNTANT")
+                .mvcMatchers("/api/auth/changepass")
+                    .hasAnyRole("ADMINISTRATOR", "AUDITOR", "USER", "ACCOUNTANT")
+                .mvcMatchers("api/empl/payment").hasAnyRole("USER", "ACCOUNTANT")
                 .mvcMatchers("/api/admin/**").hasRole("ADMINISTRATOR")
+                .mvcMatchers("/api/security/**").hasRole("AUDITOR")
                 .mvcMatchers("/api/acct/**").hasRole("ACCOUNTANT")
                 .mvcMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
@@ -51,6 +54,11 @@ public class SecurityConfiguration {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
     }
 
 }
