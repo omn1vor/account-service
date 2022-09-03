@@ -56,7 +56,7 @@ public class AdminController {
             result = "unlocked";
         }
         return ResponseEntity.ok(Map.of(
-                "status", String.format("User %s %s!", email, result)
+                "status", String.format("User %s %s!", email.toLowerCase(), result)
         ));
 
     }

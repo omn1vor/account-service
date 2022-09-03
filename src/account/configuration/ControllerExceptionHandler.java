@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 @Component
 public class ControllerExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, Object>> handle(ConstraintViolationException exception, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> handle(ConstraintViolationException exception,
+                                                      HttpServletRequest request) {
         Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
         String errorMessage = "ConstraintViolationException occurred.";
         if (!violations.isEmpty()) {
@@ -29,7 +30,7 @@ public class ControllerExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                "status", 400,
+                "status", "400",
                 "error", "Bad Request",
                 "message", errorMessage,
                 "path", request.getRequestURI()));

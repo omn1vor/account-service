@@ -35,6 +35,11 @@ public class AuditService {
         addEvent(email, action, object);
     }
 
+    public void addEvent(String email, Action action) {
+        String path = request.getRequestURI();
+        addEvent(email, action, path, path);
+    }
+
     public List<SecurityEvent> getEvents() {
         return securityEventRepo.findAll();
     }

@@ -107,6 +107,7 @@ public class UserService implements UserDetailsService {
 
     private void addRole(User user, UserGroup userGroup) {
         user.addGroup(userGroup);
+        userRepo.save(user);
         auditService.addEvent(Action.GRANT_ROLE,
                 String.format("Grant role %s to %s", userGroup.getName(), user.getUsername()));
     }
@@ -116,23 +117,23 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
         }
         user.removeGroup(userGroup);
+        userRepo.save(user);
         auditService.addEvent(Action.REMOVE_ROLE,
                 String.format("Remove role %s from %s", userGroup.getName(), user.getUsername()));
     }
 
-    public boolean registerFailedLoginAttempt(String email) {
-        boolean needToLock = false;
+    public void registerFailedLoginAttempt(String email) {
         Optional<User> foundUser = userRepo.findByUsernameIgnoreCase(email);
         if (foundUser.isEmpty()) {
-            return needToLock;
+            return;
         }
         User user = foundUser.get();
         if (user.addFailedLoginAttempt() >= MAX_FAILED_ATTEMPTS) {
-            user.setLocked(true);
-            needToLock = true;
+            auditService.addEvent(email, Action.BRUTE_FORCE);
+            if (!user.isAdministrativeAccount()) {
+                lockUser(user);
+            }
         }
-        userRepo.save(user);
-        return needToLock;
     }
 
     public void resetFailedLoginAttempts(User user) {
@@ -153,7 +154,8 @@ public class UserService implements UserDetailsService {
                     "User is already locked!");
         }
         user.setLocked(true);
-        auditService.addEvent(Action.LOCK_USER, "Lock user " + user.getUsername());
+        userRepo.save(user);
+        auditService.addEvent(user.getUsername(), Action.LOCK_USER, "Lock user " + user.getUsername());
     }
 
     public void unlockUser(String email) {
@@ -163,6 +165,8 @@ public class UserService implements UserDetailsService {
                     "User is already unlocked!");
         }
         user.setLocked(false);
-        auditService.addEvent(Action.UNLOCK_USER, "Unlock user " + email);
+        user.setFailedLoginAttempts(0);
+        userRepo.save(user);
+        auditService.addEvent(Action.UNLOCK_USER, "Unlock user " + email.toLowerCase());
     }
 }

@@ -1,5 +1,6 @@
 package account.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,9 @@ import org.springframework.web.context.request.RequestContextListener;
 
 @Configuration
 public class SecurityConfiguration {
+
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,7 +37,7 @@ public class SecurityConfiguration {
                 .mvcMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic()
+                .httpBasic().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

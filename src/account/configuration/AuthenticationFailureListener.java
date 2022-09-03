@@ -27,10 +27,6 @@ public class AuthenticationFailureListener
         String email = (String) event.getAuthentication().getPrincipal();
         String path = request.getRequestURI();
         auditService.addEvent(email, Action.LOGIN_FAILED, path);
-        boolean needToLock = userService.registerFailedLoginAttempt(email);
-        if (needToLock) {
-            auditService.addEvent(Action.BRUTE_FORCE, path);
-            userService.lockUser(email);
-        }
+        userService.registerFailedLoginAttempt(email);
     }
 }
